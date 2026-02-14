@@ -14,7 +14,7 @@ interface RTGCraneProps {
  * RTG (Rubber Tyred Gantry) Crane component
  * Portal frame structure used for moving containers in the yard
  */
-export function RTGCrane({ position, status, name, companyName, onClick }: RTGCraneProps) {
+export function RTGCrane({ position, status, onClick }: RTGCraneProps) {
   const [hovered, setHovered] = useState(false);
   const statusColor = getStatusColor(status);
 

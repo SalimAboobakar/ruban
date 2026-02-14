@@ -55,7 +55,7 @@ export function generatePredictions(portStatus: PortStatus): Prediction[] {
     predictions.push({
       id: 'pred-cost',
       type: 'recommendation',
-      message: `Off-peak scheduling could save ~$${potentialSavings}/hour`,
+      message: `جدولة خارج الذروة يمكن أن توفر ~${potentialSavings} ر.ع/ساعة`,
       confidence: 0.78,
       timestamp: portStatus.timestamp,
     });

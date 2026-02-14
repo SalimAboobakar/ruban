@@ -9,7 +9,7 @@ export const COMPANIES: Company[] = [
     id: 'MTR-001',
     name: 'Sohar Aluminum',
     industry: 'Metals',
-    base_load_mw: 145,
+    base_load_mw: 450, // Aluminum smelting: ~13-15 kWh/kg, realistic for 360k ton/year production
     location: { x: -50, y: 0, z: 150 },
     criticality: 'high',
   },
@@ -17,7 +17,7 @@ export const COMPANIES: Company[] = [
     id: 'MTR-002',
     name: 'Jindal Shadeed Iron & Steel',
     industry: 'Metals',
-    base_load_mw: 112,
+    base_load_mw: 150, // Steel production: high energy intensity
     location: { x: 50, y: 0, z: 150 },
     criticality: 'high',
   },
@@ -25,7 +25,7 @@ export const COMPANIES: Company[] = [
     id: 'MTR-003',
     name: 'Vale Oman Pelletizing',
     industry: 'Metals',
-    base_load_mw: 90,
+    base_load_mw: 110, // Iron ore pelletizing
     location: { x: 150, y: 0, z: 150 },
     criticality: 'high',
   },
@@ -103,8 +103,10 @@ export const COMPANIES: Company[] = [
   },
 ];
 
-// Total capacity
-export const PORT_CAPACITY_MW = 585;
+// Total port capacity with reserve margin (engineering standard)
+// Base load sum: 972 MW, Capacity: 1100 MW (13% reserve margin)
+// Engineering practice: 10-20% reserve capacity for reliability and growth
+export const PORT_CAPACITY_MW = 1100;
 
 // Helper function to get company by ID
 export function getCompanyById(id: string): Company | undefined {

@@ -21,18 +21,54 @@ export function PortScene({ className, portStatus }: PortSceneProps) {
   return (
     <div className={className} style={{ width: '100%', height: '100%', backgroundColor: '#1a1a2e' }}>
       <Canvas
-        shadows
+        shadows={{
+          enabled: true,
+          type: 1, // PCFSoftShadowMap
+        }}
         camera={{ position: [0, 500, 800], fov: 65 }}
         style={{ width: '100%', height: '100%' }}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: 'high-performance',
+        }}
       >
         <PerspectiveCamera makeDefault position={[0, 500, 800]} fov={65} />
 
-        {/* Sky & Lighting */}
-        <Sky sunPosition={[100, 20, 100]} />
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[200, 200, 100]} intensity={1.2} castShadow />
-        <directionalLight position={[-100, 100, 50]} intensity={0.6} />
-        <hemisphereLight args={['#87ceeb', '#0c4a6e', 0.7]} />
+        {/* Fog for depth perception */}
+        <fog attach="fog" args={['#1a1a2e', 800, 2200]} />
+
+        {/* Sky & Enhanced Lighting */}
+        <Sky 
+          sunPosition={[100, 20, 100]} 
+          turbidity={8}
+          rayleigh={2}
+        />
+        <ambientLight intensity={0.6} />
+        
+        {/* Main directional light (sun) - Optimized shadows */}
+        <directionalLight 
+          position={[200, 200, 100]} 
+          intensity={1.4} 
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-far={900}
+          shadow-camera-left={-400}
+          shadow-camera-right={400}
+          shadow-camera-top={400}
+          shadow-camera-bottom={-400}
+          shadow-bias={-0.0001}
+        />
+        
+        {/* Fill light (softer) */}
+        <directionalLight position={[-100, 100, 50]} intensity={0.5} />
+        
+        {/* Hemisphere light for realistic sky/ground ambient */}
+        <hemisphereLight args={['#87ceeb', '#0c4a6e', 0.8]} />
+        
+        {/* Rim light for better definition */}
+        <directionalLight position={[-200, 150, -100]} intensity={0.4} color="#3b82f6" />
 
         {/* Ocean - HUGE */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, -100]} receiveShadow>
@@ -68,22 +104,17 @@ export function PortScene({ className, portStatus }: PortSceneProps) {
         <STSCrane position={[50, 0, 80]} status={portStatus?.companies[2]?.status || 'normal'} name="STS-4" companyName="Steinweg" />
         <STSCrane position={[450, 0, 80]} status={portStatus?.companies[3]?.status || 'high'} name="STS-5" companyName="Oil Terminal" />
 
-        {/* ============ المنطقة 3: ساحات الحاويات (منظمة بصفوف واضحة) ============ */}
+        {/* ============ المنطقة 3: ساحات الحاويات (محسّنة للأداء) ============ */}
         
         {/* الصف الأول - قريب من الرافعات */}
-        <ContainerStacks position={[-450, 0, 200]} status="normal" rows={5} columns={8} height={4} />
-        <ContainerStacks position={[-330, 0, 200]} status="medium" rows={5} columns={8} height={5} />
-        <ContainerStacks position={[-210, 0, 200]} status="normal" rows={5} columns={8} height={4} />
-        <ContainerStacks position={[-90, 0, 200]} status="high" rows={5} columns={8} height={5} />
-        <ContainerStacks position={[30, 0, 200]} status="normal" rows={5} columns={8} height={4} />
-        <ContainerStacks position={[150, 0, 200]} status="medium" rows={5} columns={8} height={4} />
+        <ContainerStacks position={[-400, 0, 200]} status="normal" rows={4} columns={6} height={3} />
+        <ContainerStacks position={[-250, 0, 200]} status="medium" rows={4} columns={6} height={4} />
+        <ContainerStacks position={[-100, 0, 200]} status="high" rows={4} columns={6} height={4} />
+        <ContainerStacks position={[50, 0, 200]} status="normal" rows={4} columns={6} height={3} />
         
         {/* الصف الثاني - أبعد قليلاً */}
-        <ContainerStacks position={[-400, 0, 300]} status="normal" rows={4} columns={7} height={3} />
-        <ContainerStacks position={[-280, 0, 300]} status="normal" rows={4} columns={7} height={4} />
-        <ContainerStacks position={[-160, 0, 300]} status="medium" rows={4} columns={7} height={3} />
-        <ContainerStacks position={[-40, 0, 300]} status="normal" rows={4} columns={7} height={4} />
-        <ContainerStacks position={[80, 0, 300]} status="high" rows={4} columns={7} height={5} />
+        <ContainerStacks position={[-320, 0, 300]} status="normal" rows={3} columns={5} height={3} />
+        <ContainerStacks position={[-50, 0, 300]} status="medium" rows={3} columns={5} height={3} />
 
         {/* رافعات RTG في ساحات الحاويات */}
         <RTGCrane position={[-400, 0, 230]} status={portStatus?.companies[0]?.status || 'normal'} name="RTG-1" companyName="Yard-A" />
@@ -195,9 +226,9 @@ export function PortScene({ className, portStatus }: PortSceneProps) {
           </mesh>
         </group>
 
-        {/* أعمدة الإنارة - صف منظم */}
-        {Array.from({ length: 16 }).map((_, i) => {
-          const x = -650 + (i * 90);
+        {/* أعمدة الإنارة - محسّنة */}
+        {Array.from({ length: 8 }).map((_, i) => {
+          const x = -600 + (i * 170);
           return (
             <group key={`light-${i}`} position={[x, 0, 110]}>
               <mesh castShadow>
@@ -205,14 +236,14 @@ export function PortScene({ className, portStatus }: PortSceneProps) {
                 <meshStandardMaterial color="#4b5563" metalness={0.7} />
               </mesh>
               <mesh position={[0, 14, 0]}>
-                <sphereGeometry args={[1.5, 12, 12]} />
+                <sphereGeometry args={[1.3, 10, 10]} />
                 <meshStandardMaterial 
                   color="#fef3c7" 
                   emissive="#fef3c7" 
-                  emissiveIntensity={0.6}
+                  emissiveIntensity={0.5}
                 />
               </mesh>
-              <pointLight position={[0, 14, 0]} color="#fef3c7" intensity={60} distance={70} />
+              <pointLight position={[0, 14, 0]} color="#fef3c7" intensity={45} distance={80} />
             </group>
           );
         })}

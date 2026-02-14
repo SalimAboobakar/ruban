@@ -20,17 +20,25 @@ export function formatPercentage(value: number, decimals: number = 1): string {
 }
 
 /**
- * Format currency
- * @param value - Dollar amount
- * @returns Formatted string (e.g., "$12,345.67")
+ * Format currency in Omani Rial with English numbers
+ * @param value - Amount in Omani Rial
+ * @returns Formatted string with English numbers (e.g., "12,345")
  */
 export function formatCurrency(value: number): string {
+  // Use English locale for numbers
   return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+/**
+ * Format currency with symbol component (for React components)
+ * Returns just the number part, symbol should be added separately
+ */
+export function formatCurrencyValue(value: number): string {
+  return formatCurrency(value);
 }
 
 /**

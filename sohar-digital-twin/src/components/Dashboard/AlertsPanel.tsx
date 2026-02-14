@@ -1,15 +1,17 @@
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
-import type { CompanyReading } from '../../types';
+import type { PortStatus } from '../../types';
 import { Card } from '../UI/Card';
 import { formatTime } from '../../utils/formatters';
 
 interface AlertsPanelProps {
-  companies: CompanyReading[];
+  currentStatus: PortStatus | null;
 }
 
-export function AlertsPanel({ companies }: AlertsPanelProps) {
+export function AlertsPanel({ currentStatus }: AlertsPanelProps) {
+  if (!currentStatus) return null;
+
   // Generate alerts from company data
-  const alerts = companies
+  const alerts = currentStatus.companies
     .filter((c) => c.status === 'high' || c.status === 'medium')
     .map((company) => ({
       id: company.meter_id,
@@ -23,7 +25,7 @@ export function AlertsPanel({ companies }: AlertsPanelProps) {
     }));
 
   // Add a general info alert if utilization is high
-  const highUtilization = companies.filter((c) => c.status === 'high').length > 3;
+  const highUtilization = currentStatus.companies.filter((c) => c.status === 'high').length > 3;
   if (highUtilization) {
     alerts.unshift({
       id: 'general-alert',

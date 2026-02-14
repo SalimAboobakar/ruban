@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { EquipmentStatus } from '../../types';
 import { getStatusColor } from '../../utils/statusColors';
 

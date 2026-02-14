@@ -76,10 +76,13 @@ export function generatePortStatus(simulatedTime: Date = new Date()): PortStatus
   // Calculate totals
   const totalPower = readings.reduce((sum, r) => sum + r.current_power_mw, 0);
   const roundedTotal = roundTo(totalPower, 1);
-  const utilization = (roundedTotal / PORT_CAPACITY_MW) * 100;
+  // Utilization can exceed 100% in overload situations, but cap at 120% for display
+  const utilization = Math.min(120, (roundedTotal / PORT_CAPACITY_MW) * 100);
   
-  // Count alerts
-  const activeAlerts = readings.filter((r) => r.status === 'high').length;
+  // Count alerts - increase alerts if utilization > 100%
+  const baseAlerts = readings.filter((r) => r.status === 'high').length;
+  const overloadAlerts = utilization > 100 ? Math.floor((utilization - 100) / 5) : 0;
+  const activeAlerts = baseAlerts + overloadAlerts;
   
   // Calculate cost
   const costPerHour = calculateCost(roundedTotal);

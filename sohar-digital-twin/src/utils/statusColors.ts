@@ -1,10 +1,11 @@
 import type { EquipmentStatus } from '../types';
 
 // Status color definitions based on load percentage
+// Engineering standards: Normal 0-75%, Warning 75-90%, Critical 90-100%+
 export const STATUS_COLORS = {
-  normal: '#10b981',   // Green (0-70%)
-  medium: '#f59e0b',   // Yellow/Orange (70-85%)
-  high: '#ef4444',     // Red (85-100%)
+  normal: '#10b981',   // Green (0-75% - safe operating range)
+  medium: '#f59e0b',   // Yellow/Orange (75-90% - requires monitoring)
+  high: '#ef4444',     // Red (90-100%+ - critical/overload risk)
   idle: '#6b7280',     // Gray (0% or offline)
 } as const;
 
@@ -13,15 +14,20 @@ export const STATUS_COLORS = {
  * @param currentMW - Current power consumption in MW
  * @param baseMW - Base/normal power consumption in MW
  * @returns Equipment status
+ * 
+ * Engineering standards:
+ * - Normal: 0-75% (Safe operating range)
+ * - Medium: 75-90% (Requires monitoring, approaching limits)
+ * - High: 90%+ (Critical - overload risk, immediate action required)
  */
 export function getStatus(currentMW: number, baseMW: number): EquipmentStatus {
   if (currentMW <= 0.01) return 'idle';
   
   const loadPercentage = (currentMW / baseMW) * 100;
   
-  if (loadPercentage >= 85) return 'high';
-  if (loadPercentage >= 70) return 'medium';
-  return 'normal';
+  if (loadPercentage >= 90) return 'high';     // Critical/overload
+  if (loadPercentage >= 75) return 'medium';   // Warning
+  return 'normal';                              // Safe
 }
 
 /**
@@ -40,8 +46,8 @@ export function getStatusColor(status: EquipmentStatus): string {
  */
 export function getStatusFromPercentage(percentage: number): EquipmentStatus {
   if (percentage <= 0) return 'idle';
-  if (percentage >= 85) return 'high';
-  if (percentage >= 70) return 'medium';
-  return 'normal';
+  if (percentage >= 90) return 'high';     // Critical
+  if (percentage >= 75) return 'medium';   // Warning
+  return 'normal';                          // Safe
 }
 

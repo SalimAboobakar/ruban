@@ -5,11 +5,11 @@ import { formatPower, formatPercentage, formatCurrency } from '../../utils/forma
 import { Card } from '../UI/Card';
 
 interface LiveMetricsProps {
-  portStatus: PortStatus | null;
+  currentStatus: PortStatus | null;
 }
 
-export function LiveMetrics({ portStatus }: LiveMetricsProps) {
-  if (!portStatus) {
+export function LiveMetrics({ currentStatus }: LiveMetricsProps) {
+  if (!currentStatus) {
     return (
       <div className="grid grid-cols-4 gap-4 px-6 py-4">
         {[1, 2, 3, 4].map((i) => (
@@ -24,31 +24,31 @@ export function LiveMetrics({ portStatus }: LiveMetricsProps) {
   const metrics = [
     {
       label: 'Total Power',
-      value: formatPower(portStatus.total_power_mw),
+      value: formatPower(currentStatus.total_power_mw),
       icon: Zap,
       color: '#0ea5e9',
-      trend: portStatus.total_power_mw > 450 ? 'up' : 'stable',
+      trend: currentStatus.total_power_mw > 450 ? 'up' : 'stable',
     },
     {
       label: 'Capacity Utilization',
-      value: formatPercentage(portStatus.utilization_percent),
+      value: formatPercentage(Math.min(100, currentStatus.utilization_percent)), // Cap at 100% for display
       icon: Activity,
-      color: portStatus.utilization_percent > 85 ? '#ef4444' : portStatus.utilization_percent > 70 ? '#f59e0b' : '#10b981',
-      trend: portStatus.utilization_percent > 80 ? 'up' : 'stable',
+      color: currentStatus.utilization_percent > 100 ? '#ef4444' : currentStatus.utilization_percent > 85 ? '#ef4444' : currentStatus.utilization_percent > 70 ? '#f59e0b' : '#10b981',
+      trend: currentStatus.utilization_percent > 100 ? 'up' : currentStatus.utilization_percent > 80 ? 'up' : 'stable',
     },
     {
       label: 'Cost per Hour',
-      value: formatCurrency(portStatus.cost_per_hour),
+      value: formatCurrency(currentStatus.cost_per_hour),
       icon: DollarSign,
       color: '#f59e0b',
       trend: 'stable',
     },
     {
       label: 'Active Alerts',
-      value: portStatus.active_alerts.toString(),
+      value: currentStatus.active_alerts.toString(),
       icon: AlertTriangle,
-      color: portStatus.active_alerts > 0 ? '#ef4444' : '#10b981',
-      trend: portStatus.active_alerts > 0 ? 'up' : 'stable',
+      color: currentStatus.active_alerts > 0 ? '#ef4444' : '#10b981',
+      trend: currentStatus.active_alerts > 0 ? 'up' : 'stable',
     },
   ];
 
